@@ -15,11 +15,17 @@ namespace cadastro.Repositories
             _context = context;
         }
 
-        public Task<ParticipanteModel> GetParticipanteById(int id)
+        public async Task<ParticipanteModel> GetParticipanteById(int id)
         {
-            throw new NotImplementedException();
-        }
+            var participante = await _context.participantes.Include(x => x.Agendamentos).Where(x => x.Id == id).FirstOrDefaultAsync();
 
+            if (participante == null)
+            {
+                throw new KeyNotFoundException($"Participante com Id {id} não encontrado.");
+            }
+
+            return participante;
+        }
         public async Task<IEnumerable<ParticipanteDto>> GetParticipantes()
         {
             return await _context.participantes.Select(x => new ParticipanteDto

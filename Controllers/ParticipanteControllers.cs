@@ -24,5 +24,11 @@ namespace PaymentControl.Controllers
                             ? Ok(pacientes)
                             : NotFound("Participantes não encontrados");
         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var participante = await _repository.GetParticipanteById(id);
+            return participante != null ? Ok(participante) : NotFound("Participante não encontrado");
+        }
     }
 }
