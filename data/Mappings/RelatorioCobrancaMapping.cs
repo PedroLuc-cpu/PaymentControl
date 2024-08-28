@@ -1,24 +1,25 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using CsvHelper.Configuration;
-using PaymentControl.model.Dtos;
+using cadastro.Database.Mappings;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PaymentControl.model;
 
 namespace PaymentControl.data.Mappings
 {
-    public class RelatorioCobrancaMapping : ClassMap<RelatorioCobrancaDTO>
+    public class RelatorioCobrancaMapping : BaseMap<RelatorioCobrancaModel>
     {
-        public RelatorioCobrancaMapping()
+        public RelatorioCobrancaMapping() : base("relatorio_cobranca")
+        { }
+
+        public override void Configure(EntityTypeBuilder<RelatorioCobrancaModel> builder)
         {
-            Map(m => m.Sacador).Name("Sacado");
-            Map(m => m.NossoNumero).Name("Nosso Número");
-            Map(m => m.SeuNumero).Name("Seu Número");
-            Map(m => m.Entrada).Name("Entrada").TypeConverterOption.Format("dd/mm/yyyy");
-            Map(m => m.Vencimento).Name("Vencimento").TypeConverterOption.Format("dd/mm/yyyy");
-            Map(m => m.LimitePgto).Name("Dt. Limite Pgto");
-            Map(m => m.Valor).Name("Valor (R$)").TypeConverterOption.NumberStyles(NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands);
+            base.Configure(builder);
+            builder.Property(x => x.Sacador).HasColumnName("sacador").HasColumnType("varchar(255)");
+            builder.Property(x => x.NossoNumero).HasColumnName("nosso_numero").HasColumnType("varchar(255)");
+            builder.Property(x => x.SeuNumero).HasColumnName("seu_numero").HasColumnType("varchar(255)");
+            builder.Property(x => x.Entrada).HasColumnName("entrada").HasColumnType("varchar(10)");
+            builder.Property(x => x.Vencimento).HasColumnName("vencimento").HasColumnType("varchar(10)");
+            builder.Property(x => x.LimitePgto).HasColumnName("limite_pagamento").HasColumnType("varchar(30)");
+            builder.Property(x => x.Valor).HasColumnName("valor").HasColumnType("varchar(30)");
         }
     }
 }

@@ -3,6 +3,9 @@ using cadastro.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using PaymentControl.data;
+using PaymentControl.Repositories;
+using PaymentControl.Repositories.Interface;
+using PaymentControl.Services;
 
 namespace PaymentControl
 {
@@ -22,6 +25,8 @@ namespace PaymentControl
             services.AddHealthChecks();
             services.AddScoped<IBaseRepository, BaseRepository>();
             services.AddScoped<IParticipanteRepository, ParticipanteRepository>();
+            services.AddScoped<IRelatorioCobranca, RelatorioCobrancaRepository>();
+            services.AddTransient<CsvService>();
 
             services.AddDbContext<PaymentControlContext>(options =>
             {

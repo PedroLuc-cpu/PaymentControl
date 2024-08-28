@@ -9,6 +9,8 @@ namespace PaymentControl.Repositories.Interface
 {
     public interface IRelatorioCobranca
     {
-        Task<List<RelatorioCobrancaDTO>> GetRelatorioCobranca();
+        Task<List<RelatorioCobrancaDTO>> GetRelatorioCobrancaArquivo();
+        Task<List<RelatorioCobrancaDTO>> GetRelatorioCobrancas();
+        Task AddRelatorioCobranca(Stream relatorioCobrancaCsv);
     }
 }

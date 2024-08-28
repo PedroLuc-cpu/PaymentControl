@@ -1,5 +1,6 @@
 using cadastro.Model;
 using Microsoft.EntityFrameworkCore;
+using PaymentControl.model;
 
 namespace PaymentControl.data
 {
@@ -9,6 +10,7 @@ namespace PaymentControl.data
         { }
         public DbSet<AgendamentoModel> agendamentos { get; set; }
         public DbSet<ParticipanteModel> participantes { get; set; }
+        public DbSet<RelatorioCobrancaModel> relatorioCobrancas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
