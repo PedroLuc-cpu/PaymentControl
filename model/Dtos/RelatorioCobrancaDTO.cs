@@ -15,12 +15,12 @@ namespace PaymentControl.model.Dtos
         [Name("Seu Número")]
         public string SeuNumero { get; set; } = String.Empty;
         [Name("Entrada")]
-        public string? Entrada { get; set; }
+        public string Entrada { get; set; } = String.Empty;
         [Name("Vencimento")]
-        public string? Vencimento { get; set; }
+        public string Vencimento { get; set; } = String.Empty;
         [Name("Dt. Limite Pgto")]
         public string LimitePgto { get; set; } = String.Empty;
         [Name("Valor (R$)")]
-        public string? Valor { get; set; }
+        public string Valor { get; set; } = String.Empty;
     }
 }
