@@ -43,6 +43,7 @@ namespace PaymentControl.Services
             {
                 HasHeaderRecord = true,
                 HeaderValidated = null,
+                BadDataFound = null,
                 MissingFieldFound = null,
                 PrepareHeaderForMatch = args => args.Header.ToLower(),
             };
@@ -51,6 +52,7 @@ namespace PaymentControl.Services
             using var csvReader = new CsvReader(streamReader, config);
 
             bool headerFound = false;
+            string[] foundHeader = null;
 
             while (csvReader.Read())
             {
@@ -69,10 +71,12 @@ namespace PaymentControl.Services
                     }
                     break;
                 }
+                foundHeader = row;
             }
             if (!headerFound)
             {
-                throw new Exception("Cabeçalho esperado não encontrado.");
+                var foundHeaderString = foundHeader != null ? string.Join(", ", foundHeader) : "Nenhum cabeçalho encontrado";
+                throw new Exception($"Cabeçalho esperado não encontrado. Cabeçalho encontrado: {foundHeaderString}");
             }
 
             var records = csvReader.GetRecords<T>().ToList();

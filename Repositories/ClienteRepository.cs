@@ -20,7 +20,7 @@ namespace PaymentControl.Repositories
         {
             var validRecords = _csvService.LerArquivoCSV<ClienteDTO>(
                 clienteCsv,
-                row => row[0] == "idCliente",
+                row => row[0] == "idCliente" && row.Contains("nome"),
                 null,
                 null,
                 null,
