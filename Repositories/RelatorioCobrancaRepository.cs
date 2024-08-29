@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PaymentControl.data;
+using PaymentControl.data.Mappings;
 using PaymentControl.model;
 using PaymentControl.model.Dtos;
 using PaymentControl.Repositories.Interface;
@@ -19,7 +20,26 @@ namespace PaymentControl.Repositories
 
         public async Task AddRelatorioCobranca(Stream relatorioCobrancaCsv)
         {
-            var validRecords = _csvService.LerArquivoCSV(relatorioCobrancaCsv);
+            var exclusionFilter = new Dictionary<string, List<string>>
+            {
+                { "Sacador", new List<string> { "Ordenado por:", "Gerado em:", "Cedente", "Tipo Consulta:", "Conta Corrente:", "Sacado" } }
+            };
+
+            var validRecords = _csvService.LerArquivoCSV<RelatorioCobrancaDTO>(
+            relatorioCobrancaCsv,
+            row => row[0] == "Sacado" && row.Contains("Nosso Número"),
+            record => !string.IsNullOrWhiteSpace(record.Sacador) &&
+                !string.IsNullOrEmpty(record.NossoNumero) &&
+                !string.IsNullOrEmpty(record.SeuNumero) &&
+                !string.IsNullOrEmpty(record.Entrada) &&
+                !string.IsNullOrEmpty(record.Vencimento) &&
+                !string.IsNullOrEmpty(record.Valor),
+                null,
+                null,
+                new RelatorioCobrancaHelperCsvMapping(),
+                exclusionFilter
+            );
+
             foreach (var record in validRecords)
             {
                 var cobranca = new RelatorioCobrancaModel
@@ -34,6 +54,7 @@ namespace PaymentControl.Repositories
                 };
                 _context.relatorioCobrancas.Add(cobranca);
             }
+
             await _context.SaveChangesAsync();
         }
 
