@@ -31,7 +31,11 @@ namespace PaymentControl
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<PaymentControl>();
+                    webBuilder.UseStartup<PaymentControl>()
+                    .UseKestrel(options =>
+                    {
+                        options.Limits.MaxRequestBodySize = 1073741824;
+                    });
                 });
     }
 }
