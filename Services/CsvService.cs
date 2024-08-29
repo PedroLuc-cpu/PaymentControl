@@ -62,16 +62,17 @@ namespace PaymentControl.Services
                 throw new Exception("Cabeçalho esperado não encontrado.");
             }
 
-            var records = csvReader.GetRecords<RelatorioCobrancaDTO>();
+            var records = csvReader.GetRecords<RelatorioCobrancaDTO>().Where(record => !string.IsNullOrWhiteSpace(record.Sacador) &&
+                        !record.Sacador.Contains("Ordenado por:") &&
+                        !record.Sacador.Contains("Gerado em:") &&
+                        !record.Sacador.Contains("Cedente") &&
+                        !record.Sacador.Contains("Tipo Consulta:") &&
+                        !record.Sacador.Contains("Conta Corrente:") &&
+                        !record.Sacador.Contains("Sacado"))
+                .ToList();
             foreach (var record in records)
             {
-                if (!string.IsNullOrWhiteSpace(record.Sacador) &&
-                    !record.Sacador.Contains("Ordenado por:") &&
-                    !record.Sacador.Contains("Gerado em:") &&
-                    !record.Sacador.Contains("Cedente:") &&
-                    !record.Sacador.Contains("Tipo Consulta:") &&
-                    !record.Sacador.Contains("Conta Corrente:")
-                )
+                if (!string.IsNullOrWhiteSpace(record.Sacador))
                 {
                     validRecords.Add(record);
                 }
