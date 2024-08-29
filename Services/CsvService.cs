@@ -1,7 +1,6 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
-using PaymentControl.data.Mappings;
 using PaymentControl.model.Dtos;
 
 namespace PaymentControl.Services
@@ -17,7 +16,15 @@ namespace PaymentControl.Services
             }
         }
 
-        public List<RelatorioCobrancaDTO> LerArquivoCSV(Stream stream, Stream validOutStream = null, Stream invalidOutStream = null)
+        public List<T> LerArquivoCSV<T>(
+            Stream stream,
+            Func<string[], bool> isHeaderValid,
+            Func<T, bool> isValid,
+            Stream validOutStream = null,
+            Stream invalidOutStream = null,
+            ClassMap<T> classMap = null,
+            Dictionary<string, List<string>> exclusionFilters = null
+        )
         {
             if (stream == null)
             {
@@ -29,13 +36,14 @@ namespace PaymentControl.Services
                 throw new ArgumentException("O fluxo de entrada não é legível.", nameof(stream));
             }
 
-            var validRecords = new List<RelatorioCobrancaDTO>();
-            var invalidRecords = new List<RelatorioCobrancaDTO>();
+            var validRecords = new List<T>();
+            var invalidRecords = new List<T>();
 
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HasHeaderRecord = true,
                 HeaderValidated = null,
+                BadDataFound = null,
                 MissingFieldFound = null,
                 PrepareHeaderForMatch = args => args.Header.ToLower(),
             };
@@ -44,35 +52,58 @@ namespace PaymentControl.Services
             using var csvReader = new CsvReader(streamReader, config);
 
             bool headerFound = false;
+            string[] foundHeader = null;
 
             while (csvReader.Read())
             {
                 var row = csvReader.Context.Parser.Record;
-                if (row[0] == "Sacado" && row.Contains("Nosso Número"))
+                if (isHeaderValid(row))
                 {
                     headerFound = true;
                     csvReader.ReadHeader();
-                    csvReader.Context.RegisterClassMap<RelatorioCobrancaHelperCsvMapping>();
+                    if (classMap != null)
+                    {
+                        csvReader.Context.RegisterClassMap(classMap);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("ClassMap é obrigatório, mas não foi fornecido.");
+                    }
                     break;
                 }
+                foundHeader = row;
             }
-
             if (!headerFound)
             {
-                throw new Exception("Cabeçalho esperado não encontrado.");
+                var foundHeaderString = foundHeader != null ? string.Join(", ", foundHeader) : "Nenhum cabeçalho encontrado";
+                throw new Exception($"Cabeçalho esperado não encontrado. Cabeçalho encontrado: {foundHeaderString}");
             }
 
-            var records = csvReader.GetRecords<RelatorioCobrancaDTO>().Where(record => !string.IsNullOrWhiteSpace(record.Sacador) &&
-                        !record.Sacador.Contains("Ordenado por:") &&
-                        !record.Sacador.Contains("Gerado em:") &&
-                        !record.Sacador.Contains("Cedente") &&
-                        !record.Sacador.Contains("Tipo Consulta:") &&
-                        !record.Sacador.Contains("Conta Corrente:") &&
-                        !record.Sacador.Contains("Sacado"))
-                .ToList();
+            var records = csvReader.GetRecords<T>().ToList();
+
+            if (exclusionFilters != null)
+            {
+                records = records.Where(record =>
+                {
+                    foreach (var filter in exclusionFilters)
+                    {
+                        var property = typeof(T).GetProperty(filter.Key);
+                        if (property != null)
+                        {
+                            var value = property.GetValue(record)?.ToString();
+                            if (filter.Value.Any(exclude => value != null && value.Contains(exclude)))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                }).ToList();
+            }
+
             foreach (var record in records)
             {
-                if (!string.IsNullOrWhiteSpace(record.Sacador))
+                if (isValid(record))
                 {
                     validRecords.Add(record);
                 }
@@ -98,5 +129,6 @@ namespace PaymentControl.Services
 
             return validRecords;
         }
+
     }
 }

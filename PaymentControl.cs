@@ -1,5 +1,6 @@
 using cadastro.Repositories;
 using cadastro.Repositories.Interface;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using PaymentControl.data;
@@ -18,6 +19,21 @@ namespace PaymentControl
         public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<FormOptions>(x =>
+            {
+                x.MultipartBodyLengthLimit = 1073741824;
+            });
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                build =>
+                {
+                    build.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
+
             services.AddControllers().AddNewtonsoftJson(option =>
             {
                 option.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
@@ -26,6 +42,7 @@ namespace PaymentControl
             services.AddScoped<IBaseRepository, BaseRepository>();
             services.AddScoped<IParticipanteRepository, ParticipanteRepository>();
             services.AddScoped<IRelatorioCobranca, RelatorioCobrancaRepository>();
+            services.AddScoped<IClienteRepository, ClienteRepository>();
             services.AddTransient<CsvService>();
 
             services.AddDbContext<PaymentControlContext>(options =>
@@ -56,6 +73,8 @@ namespace PaymentControl
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Payment Control v1"));
             }
+            app.UseCors("AllowAll");
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
