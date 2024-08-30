@@ -40,8 +40,8 @@ namespace PaymentControl.model.Dtos
         public bool? OptSimplesNac { get; set; }
         [Name("booFuncionario")]
         public bool? BooFuncionario { get; set; }
-        [Name("imagem")]
-        public byte[]? Imagem { get; set; }
+        // [Name("imagem")]
+        // public byte[]? Imagem { get; set; }
         [Name("orgExpedidor")]
         public string OrgExpedidor { get; set; } = String.Empty;
         [Name("contador")]
