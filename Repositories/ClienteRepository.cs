@@ -40,6 +40,7 @@ namespace PaymentControl.Repositories
                 if (existingCliente != null)
                 {
                     // Atualize o cliente existente com os novos dados
+                    existingCliente.Id_Cliente = record.IdCliente;
                     existingCliente.Nome = record.Nome;
                     existingCliente.Email = record.Email;
                     existingCliente.DataNasc = record.DataNasc;
@@ -66,6 +67,7 @@ namespace PaymentControl.Repositories
                 {
                     var cliente = new ClienteModel
                     {
+                        Id_Cliente = record.IdCliente,
                         Nome = record.Nome,
                         Email = record.Email,
                         DataNasc = record.DataNasc,
