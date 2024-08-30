@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using PaymentControl.data;
 using PaymentControl.data.Mappings;
 using PaymentControl.model;
@@ -18,10 +19,14 @@ namespace PaymentControl.Repositories
         }
         public async Task AddCliente(Stream clienteCsv)
         {
+            bool isValidRecord(ClienteDTO record)
+            {
+                return record != null && !string.IsNullOrEmpty(record.Nome);
+            }
             var validRecords = _csvService.LerArquivoCSV<ClienteDTO>(
                 clienteCsv,
-                row => row[0] == "idCliente" && row.Contains("nome"),
-                null,
+                header => header.Contains("idCliente") && header.Contains("nome"),
+                isValidRecord,
                 null,
                 null,
                 new ClienteHelperCsvMapping(),
@@ -29,35 +34,66 @@ namespace PaymentControl.Repositories
             );
             foreach (var record in validRecords)
             {
-                var cliente = new ClienteModel
+                var existingCliente = await _context.clientes
+                .FirstOrDefaultAsync(c => c.Cpf == record.Cpf);
+
+                if (existingCliente != null)
                 {
-                    Nome = record.Nome,
-                    Email = record.Email,
-                    DataNasc = record.DataNasc,
-                    Cpf = record.Cpf,
-                    SexoMasc = record.SexoMasc,
-                    Fisica = record.Fisica,
-                    DtCadastro = record.DtCadastro,
-                    Rg = record.Rg,
-                    Observacao = record.Observacao,
-                    Trabalho = record.Trabalho,
-                    ObsDocFis = record.ObsDocFis,
-                    BooCliente = record.BooCliente,
-                    BooFornecedor = record.BooFornecedor,
-                    InscMunicipal = record.InscMunicipal,
-                    Ativo = record.Ativo,
-                    OptSimplesNac = record.OptSimplesNac,
-                    BooFuncionario = record.BooFuncionario,
-                    Imagem = record.Imagem,
-                    OrgExpedidor = record.OrgExpedidor,
-                    Contador = record.Contador,
-                    Suframa = record.Suframa,
-                    ClienteSistema = record.ClienteSistema,
-                    ValidadeCertificado = record.ValidadeCertificado,
-                };
-                _context.clientes.Add(cliente);
+                    // Atualize o cliente existente com os novos dados
+                    existingCliente.Nome = record.Nome;
+                    existingCliente.Email = record.Email;
+                    existingCliente.DataNasc = record.DataNasc;
+                    existingCliente.SexoMasc = record.SexoMasc;
+                    existingCliente.Fisica = record.Fisica;
+                    existingCliente.DtCadastro = record.DtCadastro;
+                    existingCliente.Rg = record.Rg;
+                    existingCliente.Observacao = record.Observacao;
+                    existingCliente.Trabalho = record.Trabalho;
+                    existingCliente.ObsDocFis = record.ObsDocFis;
+                    existingCliente.BooCliente = record.BooCliente;
+                    existingCliente.BooFornecedor = record.BooFornecedor;
+                    existingCliente.InscMunicipal = record.InscMunicipal;
+                    existingCliente.Ativo = record.Ativo;
+                    existingCliente.OptSimplesNac = record.OptSimplesNac;
+                    existingCliente.BooFuncionario = record.BooFuncionario;
+                    existingCliente.OrgExpedidor = record.OrgExpedidor;
+                    existingCliente.Contador = record.Contador;
+                    existingCliente.Suframa = record.Suframa;
+                    existingCliente.ClienteSistema = record.ClienteSistema;
+                    existingCliente.ValidadeCertificado = record.ValidadeCertificado;
+                }
+                else
+                {
+                    var cliente = new ClienteModel
+                    {
+                        Nome = record.Nome,
+                        Email = record.Email,
+                        DataNasc = record.DataNasc,
+                        Cpf = record.Cpf,
+                        SexoMasc = record.SexoMasc,
+                        Fisica = record.Fisica,
+                        DtCadastro = record.DtCadastro,
+                        Rg = record.Rg,
+                        Observacao = record.Observacao,
+                        Trabalho = record.Trabalho,
+                        ObsDocFis = record.ObsDocFis,
+                        BooCliente = record.BooCliente,
+                        BooFornecedor = record.BooFornecedor,
+                        InscMunicipal = record.InscMunicipal,
+                        Ativo = record.Ativo,
+                        OptSimplesNac = record.OptSimplesNac,
+                        BooFuncionario = record.BooFuncionario,
+                        // Imagem = record.Imagem,  // Comentado se não estiver no banco
+                        OrgExpedidor = record.OrgExpedidor,
+                        Contador = record.Contador,
+                        Suframa = record.Suframa,
+                        ClienteSistema = record.ClienteSistema,
+                        ValidadeCertificado = record.ValidadeCertificado,
+                    };
+                    _context.clientes.Add(cliente);
+                }
+                await _context.SaveChangesAsync();
             }
-            await _context.SaveChangesAsync();
         }
 
         public Task<List<ClienteDTO>> GetClientes()
