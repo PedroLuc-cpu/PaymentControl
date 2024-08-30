@@ -4,6 +4,7 @@ namespace PaymentControl.model
 {
     public class ClienteModel : Base
     {
+        public int? Id_Cliente { get; set; }
         public string Nome { get; set; } = String.Empty;
         public string Email { get; set; } = String.Empty;
         public DateTime? DataNasc { get; set; }
