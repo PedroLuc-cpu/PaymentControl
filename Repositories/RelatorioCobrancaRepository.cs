@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using PaymentControl.data;
 using PaymentControl.data.Mappings;
@@ -42,6 +43,26 @@ namespace PaymentControl.Repositories
 
             foreach (var record in validRecords)
             {
+                int clienteID = ExtractClienteIdFromSeuNumero(record.SeuNumero) ?? 0;
+                var cliente = await _context.clientes.FindAsync(clienteID);
+                if (cliente == null)
+                {
+                    int? observacaoNumero = ExtractClienteIdFromSeuNumero(cliente.Observacao ?? string.Empty);
+                    if (observacaoNumero.HasValue)
+                    {
+                        cliente = await _context.clientes
+                            .Where(c => ExtractClienteIdFromSeuNumero(c.Observacao) == observacaoNumero.Value)
+                            .FirstOrDefaultAsync();
+                        if (cliente == null)
+                        {
+                            throw new Exception($"Cliente com ID {clienteID} e número de observação {observacaoNumero.Value} não existe.");
+                        }
+                        else
+                        {
+                            throw new Exception($"O cliente com ID {clienteID} não existe e nenhum número de observação válido está disponível.");
+                        }
+                    }
+                }
                 var cobranca = new RelatorioCobrancaModel
                 {
                     Sacador = record.Sacador,
@@ -51,11 +72,27 @@ namespace PaymentControl.Repositories
                     Vencimento = record.Vencimento,
                     LimitePgto = record.LimitePgto,
                     Valor = record.Valor,
+                    idCliente = clienteID,
                 };
                 _context.relatorioCobrancas.Add(cobranca);
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        private int? ExtractClienteIdFromSeuNumero(string seuNumero)
+        {
+            var match = Regex.Match(seuNumero, @"(?:COD AUT|COD LEG):\s*(\d+)");
+            if (match.Success)
+            {
+                return int.Parse(match.Groups[1].Value);
+            }
+            match = Regex.Match(seuNumero, @"\d+");
+            if (match.Success)
+            {
+                return int.Parse(match.Value);
+            }
+            return null;
         }
 
         public Task<List<RelatorioCobrancaDTO>> GetRelatorioCobrancaArquivo()

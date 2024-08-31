@@ -20,6 +20,10 @@ namespace PaymentControl.data.Mappings
             builder.Property(x => x.Vencimento).HasColumnName("vencimento").HasColumnType("varchar(10)");
             builder.Property(x => x.LimitePgto).HasColumnName("limite_pagamento").HasColumnType("varchar(30)");
             builder.Property(x => x.Valor).HasColumnName("valor").HasColumnType("varchar(30)");
+            builder.HasOne(rc => rc.Cliente)
+            .WithMany()
+            .HasForeignKey(rc => rc.idCliente)
+            .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
