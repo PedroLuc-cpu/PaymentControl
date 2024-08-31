@@ -16,6 +16,22 @@ namespace PaymentControl.Controllers
             _csvService = csvService;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetCliente(int pageNumber = 1, int pageSize = 100, bool? clienteSistema = null)
+        {
+            if (pageNumber <= 0 || pageSize <= 0)
+            {
+                return BadRequest("pageNumber e pageSize devem ser maiores que zero.");
+            }
+            var (clientes, totalClientes) = await _clienteRepository.GetClientes(pageNumber, pageSize, clienteSistema);
+
+            return Ok(new
+            {
+                TotalClientes = totalClientes,
+                Clientes = clientes
+            });
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetClienteById(int id)
         {

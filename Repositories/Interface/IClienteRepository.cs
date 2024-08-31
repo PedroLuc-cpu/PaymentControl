@@ -10,7 +10,7 @@ namespace PaymentControl.Repositories.Interface
     public interface IClienteRepository
     {
         Task<List<ClienteDTO>> GetClientesArquivo();
-        Task<List<ClienteDTO>> GetClientes();
+        Task<(List<ClienteDTO> Clientes, int TotalClientes)> GetClientes(int pageNumber, int pageSize, bool? clienteSistema);
         Task AddCliente(Stream clienteCsv);
         Task<ClienteDTO> GetClienteById(int id);
     }
