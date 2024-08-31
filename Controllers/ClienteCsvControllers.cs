@@ -16,6 +16,17 @@ namespace PaymentControl.Controllers
             _csvService = csvService;
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetClienteById(int id)
+        {
+            var cliente = await _clienteRepository.GetClienteById(id);
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+            return Ok(cliente);
+        }
+
         [HttpPost("uploadCliente")]
         public async Task<IActionResult> Upload([FromForm] ICollection<IFormFile> files)
         {

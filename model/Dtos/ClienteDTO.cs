@@ -52,5 +52,6 @@ namespace PaymentControl.model.Dtos
         public bool ClienteSistema { get; set; }
         [Name("validadeCertificado")]
         public DateTime ValidadeCertificado { get; set; }
+        public List<RelatorioCobrancaDTO> boletos { get; set; }
     }
 }

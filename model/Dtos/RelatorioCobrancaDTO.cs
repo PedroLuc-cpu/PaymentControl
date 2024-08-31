@@ -8,6 +8,7 @@ namespace PaymentControl.model.Dtos
 {
     public class RelatorioCobrancaDTO
     {
+        public int Id { get; set; }
         [Name("Sacado")]
         public string Sacador { get; set; } = String.Empty;
         [Name("Nosso Número")]
