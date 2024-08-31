@@ -98,7 +98,7 @@ namespace PaymentControl.Repositories
             }
         }
 
-        public async Task<ClienteDTO?> GetClienteById(int id)
+        public async Task<ClienteDTO> GetClienteById(int id)
         {
             var cliente = await _context.clientes
             .Include(c => c.Boletos)
@@ -128,9 +128,50 @@ namespace PaymentControl.Repositories
             return clienteDTO;
         }
 
-        public Task<List<ClienteDTO>> GetClientes()
+        public async Task<(List<ClienteDTO> Clientes, int TotalClientes)> GetClientes(int pageNumber, int pageSize, bool? clienteSistema = null)
         {
-            throw new NotImplementedException();
+            // Inicia a query base para contar o total de clientes
+            var query = _context.clientes.AsQueryable();
+
+            // Aplica o filtro por cliente de sistema, se especificado
+            if (clienteSistema.HasValue)
+            {
+                query = query.Where(c => c.ClienteSistema == clienteSistema.Value);
+            }
+
+            var totalClientes = await query.CountAsync();
+
+            var clientes = await query
+                .Include(c => c.Boletos) // Inclui os boletos relacionados aos clientes
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => new ClienteDTO
+                {
+                    IdCliente = c.Id,
+                    Nome = c.Nome,
+                    Email = c.Email,
+                    Cpf = c.Cpf,
+                    DtCadastro = c.DtCadastro,
+                    Observacao = c.Observacao,
+                    BooCliente = c.BooCliente,
+                    Ativo = c.Ativo,
+                    ClienteSistema = c.ClienteSistema,
+
+                    // Mapeia os boletos para o DTO correspondente
+                    boletos = c.Boletos.Select(b => new RelatorioCobrancaDTO
+                    {
+                        Id = b.Id,
+                        Sacador = b.Sacador,
+                        NossoNumero = b.NossoNumero,
+                        SeuNumero = b.SeuNumero,
+                        Entrada = b.Entrada,
+                        Vencimento = b.Vencimento,
+                        Valor = b.Valor,
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return (clientes, totalClientes);
         }
 
         public Task<List<ClienteDTO>> GetClientesArquivo()
