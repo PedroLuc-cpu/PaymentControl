@@ -12,5 +12,6 @@ namespace PaymentControl.Repositories.Interface
         Task<List<ClienteDTO>> GetClientesArquivo();
         Task<List<ClienteDTO>> GetClientes();
         Task AddCliente(Stream clienteCsv);
+        Task<ClienteDTO> GetClienteById(int id);
     }
 }

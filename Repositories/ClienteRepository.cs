@@ -98,6 +98,36 @@ namespace PaymentControl.Repositories
             }
         }
 
+        public async Task<ClienteDTO?> GetClienteById(int id)
+        {
+            var cliente = await _context.clientes
+            .Include(c => c.Boletos)
+            .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (cliente == null)
+            {
+                return null;
+            }
+
+            var clienteDTO = new ClienteDTO()
+            {
+                IdCliente = cliente.Id,
+                Nome = cliente.Nome,
+                boletos = cliente.Boletos.Select(b => new RelatorioCobrancaDTO
+                {
+                    Id = b.Id,
+                    Sacador = b.Sacador,
+                    NossoNumero = b.NossoNumero,
+                    SeuNumero = b.SeuNumero,
+                    Entrada = b.Entrada,
+                    Vencimento = b.Vencimento,
+                    Valor = b.Valor,
+                }).ToList()
+
+            };
+            return clienteDTO;
+        }
+
         public Task<List<ClienteDTO>> GetClientes()
         {
             throw new NotImplementedException();

@@ -21,7 +21,7 @@ namespace PaymentControl.data.Mappings
             builder.Property(x => x.LimitePgto).HasColumnName("limite_pagamento").HasColumnType("varchar(30)");
             builder.Property(x => x.Valor).HasColumnName("valor").HasColumnType("varchar(30)");
             builder.HasOne(rc => rc.Cliente)
-            .WithMany()
+            .WithMany(c => c.Boletos)
             .HasForeignKey(rc => rc.idCliente)
             .OnDelete(DeleteBehavior.Restrict);
         }
