@@ -103,17 +103,11 @@ namespace PaymentControl.Repositories
             var cliente = await _context.clientes
             .Include(c => c.Boletos)
             .FirstOrDefaultAsync(c => c.Id == id);
-
-            if (cliente == null)
-            {
-                return null;
-            }
-
             var clienteDTO = new ClienteDTO()
             {
                 IdCliente = cliente.Id,
                 Nome = cliente.Nome,
-                boletos = cliente.Boletos.Select(b => new RelatorioCobrancaDTO
+                Boletos = (ICollection<RelatorioCobrancaModel>)cliente.Boletos.Select(b => new RelatorioCobrancaDTO
                 {
                     Id = b.Id,
                     Sacador = b.Sacador,
@@ -158,7 +152,7 @@ namespace PaymentControl.Repositories
                     ClienteSistema = c.ClienteSistema,
 
                     // Mapeia os boletos para o DTO correspondente
-                    boletos = c.Boletos.Select(b => new RelatorioCobrancaDTO
+                    Boletos = (ICollection<RelatorioCobrancaModel>)c.Boletos.Select(b => new RelatorioCobrancaDTO
                     {
                         Id = b.Id,
                         Sacador = b.Sacador,

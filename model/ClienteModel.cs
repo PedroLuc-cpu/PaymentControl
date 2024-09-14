@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using cadastro.Model;
 using PaymentControl.model.Dtos;
 
@@ -29,6 +30,6 @@ namespace PaymentControl.model
         public string Suframa { get; set; } = String.Empty;
         public bool ClienteSistema { get; set; }
         public DateTime ValidadeCertificado { get; set; }
-        public List<RelatorioCobrancaModel> Boletos { get; set; }
+        public ICollection<RelatorioCobrancaModel> Boletos { get; set; } = new Collection<RelatorioCobrancaModel>();
     }
 }

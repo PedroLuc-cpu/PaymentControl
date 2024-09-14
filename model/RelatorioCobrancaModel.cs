@@ -16,6 +16,6 @@ namespace PaymentControl.model
         public string LimitePgto { get; set; } = String.Empty;
         public string Valor { get; set; } = String.Empty;
         public int idCliente { get; set; }
-        public ClienteModel Cliente { get; set; }
+        public ClienteModel Cliente { get; set; } = new ClienteModel();
     }
 }

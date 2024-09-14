@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CsvHelper.Configuration.Attributes;
 
 namespace PaymentControl.model.Dtos
@@ -52,6 +53,7 @@ namespace PaymentControl.model.Dtos
         public bool ClienteSistema { get; set; }
         [Name("validadeCertificado")]
         public DateTime ValidadeCertificado { get; set; }
-        public List<RelatorioCobrancaDTO> boletos { get; set; }
+        [Name("boletos")]
+        public ICollection<RelatorioCobrancaModel> Boletos { get; set; } = new Collection<RelatorioCobrancaModel>();
     }
 }

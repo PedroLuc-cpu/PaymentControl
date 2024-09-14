@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PaymentControl.Repositories.Interface;
 using PaymentControl.Services;
@@ -6,6 +7,7 @@ namespace PaymentControl.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class ClienteCsvControllers : Controller
     {
         private readonly IClienteRepository _clienteRepository;

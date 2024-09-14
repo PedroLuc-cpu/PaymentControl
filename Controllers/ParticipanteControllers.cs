@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using cadastro.Repositories.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PaymentControl.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ParticipanteControllers : ControllerBase
     {
         private readonly IParticipanteRepository _repository;

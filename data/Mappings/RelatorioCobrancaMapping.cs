@@ -23,7 +23,6 @@ namespace PaymentControl.data.Mappings
             builder.HasOne(rc => rc.Cliente)
             .WithMany(c => c.Boletos)
             .HasForeignKey(rc => rc.idCliente)
-            .OnDelete(DeleteBehavior.Restrict);
-        }
+            .OnDelete(DeleteBehavior.Restrict);        }
     }
 }

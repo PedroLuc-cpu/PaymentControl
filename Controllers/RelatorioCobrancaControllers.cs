@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PaymentControl.model.Dtos;
 using PaymentControl.Repositories.Interface;
@@ -6,6 +7,7 @@ namespace PaymentControl.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class RelatorioCobrancaControllers : Controller
     {
         private readonly IRelatorioCobranca _relatorioCobrancaRepository;

@@ -12,6 +12,7 @@ namespace PaymentControl.data
         public DbSet<ParticipanteModel> participantes { get; set; }
         public DbSet<RelatorioCobrancaModel> relatorioCobrancas { get; set; }
         public DbSet<ClienteModel> clientes { get; set; }
+        public DbSet<User> users { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

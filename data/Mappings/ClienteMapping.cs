@@ -45,6 +45,9 @@ namespace PaymentControl.data.Mappings
                                 .HasDefaultValue(false).IsRequired();
                         builder.Property(x => x.ValidadeCertificado).HasColumnName("validade_certificado")
                                 .HasColumnType("date").HasDefaultValue(new DateTime(1899, 12, 30));
+                        builder.HasMany(c => c.Boletos)
+                                .WithOne(c => c.Cliente)
+                                .HasPrincipalKey(b => b.Id_Cliente);
                 }
         }
 }
